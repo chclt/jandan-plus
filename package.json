@@ -1,0 +1,29 @@
+{
+  "name": "jandan-plus",
+  "version": "1.0.0",
+  "description": "A series of cherries for jandan.net.",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c --bundleConfigAsCjs | node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chclt/jandan-plus.git"
+  },
+  "author": "Chclt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chclt/jandan-plus/issues"
+  },
+  "homepage": "https://github.com/chclt/jandan-plus#readme",
+  "dependencies": {
+    "@flyskywhy/gifuct-js": "^3.0.0",
+    "@webcomponents/custom-elements": "^1.6.0"
+  },
+  "devDependencies": {
+    "rollup": "^3.27.2",
+    "@rollup/plugin-commonjs": "^25.0.3",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}

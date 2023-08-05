@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "煎煎煎蛋",
+    "description": "煎蛋网体验优化",
+    "version": "1.0",
+    "icons": {
+        "16": "assets/icon-16.png",
+        "32": "assets/icon-32.png",
+        "48": "assets/icon-48.png",
+        "128": "assets/icon-128.png"
+    },
+    "content_scripts": [ {
+        "js": ["index.js"],
+        "css": ["index.css"],
+        "matches": ["*://jandan.net/top", "*://jandan.net/top-4h", "*://jandan.net/top-tucao", "*://jandan.net/top-ooxx", "*://jandan.net/top-comments", "*://jandan.net/top-3days", "*://jandan.net/top-7days", "*://jandan.net/qa*", "*://jandan.net/treehole*", "*://jandan.net/ooxx*", "*://jandan.net/pic*", "*://jandan.net/t/*"],
+        "run_at": "document_end"
+    } ]
+}
+
