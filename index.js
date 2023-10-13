@@ -295,11 +295,11 @@ canvas {
                     } catch (error) {
                         return;
                     }
-                    
+
                     break;
-            
+
             }
-            
+
             switch (action) {
                 case 'play':
                     if (this.paused) {
@@ -359,7 +359,7 @@ canvas {
 
         this.shadowRoot.querySelector('.media-controls-progress-panel').addEventListener('pointerdown', (event) => {
             if (!this._fetched) return;
-            
+
             event.preventDefault();
 
             let temp = event.currentTarget.querySelector('.media-controls-progress');
@@ -378,7 +378,7 @@ canvas {
 
         document.addEventListener('pointermove', (event) => {
             if (!this._pointerEvent.start) return;
-            
+
             event.preventDefault();
 
             this._pointerEvent.move = {
@@ -464,7 +464,7 @@ canvas {
 
         try {
             let response = await fetch(this._imageSrc, { mode: this.crossorigin ? 'cors' : 'no-cors' });
-        
+
             if (!response.ok) {
                 this._fetched = false;
                 throw new Error(response);
@@ -549,7 +549,7 @@ canvas {
 
         this._canvas.width = this._loadedFrames[0].dims.width
         this._canvas.height = this._loadedFrames[0].dims.height
-      
+
         this._gifCanvas.width = this._canvas.width
         this._gifCanvas.height = this._canvas.height
 
@@ -558,7 +558,7 @@ canvas {
 
     _drawPatch(frame) {
         let dims = frame.dims;
-      
+
         if (
             !this._frameImageData ||
             dims.width != this._frameImageData.width ||
@@ -568,28 +568,28 @@ canvas {
             this._tempCanvas.height = dims.height;
             this._frameImageData = this._tempCtx.createImageData(dims.width, dims.height);
         }
-      
+
         // set the patch data as an override
         this._frameImageData.data.set(frame.patch);
-      
+
         // draw the patch back over the canvas
         this._tempCtx.putImageData(this._frameImageData, 0, 0);
-      
+
         this._gifCtx.drawImage(this._tempCanvas, dims.left, dims.top);
     }
 
     _manipulate() {
         let imageData = this._gifCtx.getImageData(0, 0, this._gifCanvas.width, this._gifCanvas.height);
         let other = this._gifCtx.createImageData(this._gifCanvas.width, this._gifCanvas.height);
-      
+
         let pixelPercent = 100;;
         let pixelsX = 5 + Math.floor((pixelPercent / 100) * (this._canvas.width - 5));
         let pixelsY = (pixelsX * this._canvas.height) / this._canvas.width;
-      
+
         this._ctx.putImageData(imageData, 0, 0);
         this._ctx.drawImage(this._canvas, 0, 0, this._canvas.width, this._canvas.height, 0, 0, pixelsX, pixelsY);
         this._ctx.drawImage(this._canvas, 0, 0, pixelsX, pixelsY, 0, 0, this._canvas.width, this._canvas.height);
-      
+
     }
 
     renderFrame(frameIndex = undefined) {
@@ -612,12 +612,12 @@ canvas {
         if (frame.disposalType === 2) {
             this._needsDisposal = true;
         }
-        
+
         if (!this.paused) {
         switch (this.playbackMode) {
             case 'reverse':
                 this._frameIndex--;
-                if (this._frameIndex < 0) 
+                if (this._frameIndex < 0)
                     this._frameIndex = this._loadedFrames.length - 1;
                 break;
             case 'bounce':
@@ -642,10 +642,10 @@ canvas {
                 }
                 break;
         }
-        
+
         let end = new Date().getTime();
         let diff = end - start;
-        
+
             let that = this;
             this._timeoutID = setTimeout(() => {
                 requestAnimationFrame(() => {
@@ -665,7 +665,7 @@ canvas {
         this.shadowRoot.querySelector('.play-pause').classList.remove('play');
         this.shadowRoot.querySelector('.media-controls-enclosure').classList.remove('show');
     }
-    
+
     pause() {
         this.paused = true;
         this.shadowRoot.querySelector('.play-pause').classList.add('play');
@@ -691,6 +691,9 @@ if (config.autoplay) {
 imgElList.forEach((img) => {
     let poster = img.getAttribute('src');
     let src    = img.getAttribute('org_src') || img.getAttribute('src');
+
+    poster = poster.replace('moyu.im', 'sinaimg.cn');
+    src = src.replace('moyu.im', 'sinaimg.cn');
 
     let player = document.createElement('cherry-gif');
     config.autoplay ? player.setAttribute('autoplay') : player.setAttribute('preload', 'none');

@@ -36,4 +36,12 @@ fs.copyFile(
     }
 );
 
+fs.copyFile(
+  path.join(__dirname, 'rules.json'),
+  path.join(__dirname, 'dist/rules.json'),
+  (err) => {
+    if (err) throw err;
+  }
+);
+
 copyFolder('assets', 'dist/assets');
