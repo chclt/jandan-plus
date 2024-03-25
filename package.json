@@ -4,7 +4,7 @@
   "description": "A series of cherries for jandan.net.",
   "main": "index.js",
   "scripts": {
-    "build": "rollup -c --bundleConfigAsCjs | node build.js"
+    "build": "node build.js"
   },
   "repository": {
     "type": "git",
