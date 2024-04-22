@@ -1,0 +1,29 @@
+/* 在 js 里添加的 "发布按钮" */
+
+#wrapper #comment_new {
+    z-index: 10;
+    order: 99;
+    grid-column-start: 2;
+    padding: 0;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 9999px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: sticky !important;
+    margin-left: calc(75% - 6rem);
+    margin-top: -4rem;
+    bottom: 2rem;
+    background-color: var(--bg-primary);
+
+    font-size: 2rem;
+    color: var(--text-primary);
+}
+
+
+#wrapper #nav_top {
+    bottom: 7rem;
+}

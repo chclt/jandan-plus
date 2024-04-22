@@ -1,0 +1,663 @@
+
+/**
+ * 问答、树洞、随手拍、无聊图、热榜、大杂烩（大杂烩的 HTML 不太一样，所以还需要额外一个CSS）
+ *
+ * .commentlist 帖子列表
+ * .jandan-tucao 评论（吐槽）区，里面又有热评列表和其他评论列表
+ *
+ * .row 帖子
+ * .tucao-row 评论（吐槽）
+ *
+ * .jandan-vote 帖子的投票区
+ * .tucao-vote 评论的投票区
+ */
+
+
+body #content .post {
+    border-bottom: var(--border);
+}
+
+
+#content #comments .comments {
+    margin: 0;
+    padding: 0;
+}
+
+#content .commentlist {
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    font-size: inherit;
+    line-height: inherit;
+}
+
+#content .commentlist li, 
+#content .commentlist li > div {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+#content .commentlist .row,
+#content .tucao-row {
+    position: relative;
+    margin: 0;
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    font-size: inherit;
+    line-height: inherit;
+    border-bottom: var(--border);
+}
+
+#content .commentlist .author,
+#content .tucao-author {
+    margin: 0 0 0.75rem;
+    padding: 0;
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    font-size: inherit;
+    line-height: inherit;
+}
+
+#content .commentlist .author strong,
+#content .tucao-author strong {
+    font-weight: 700;
+}
+
+#content .commentlist .author small,
+#content .commentlist .author small a,
+#content .commentlist .text .righttext,
+#content .commentlist .text .righttext  a {
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-secondary);
+}
+
+#content .commentlist .author small {
+    margin-left: 0.25rem;
+}
+
+#content .commentlist .text,
+#content .tucao-content {
+    margin: 0;
+    padding: 0;
+    width: auto;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-primary);
+}
+
+#content .commentlist .text p br,
+#content .tucao-content br {
+    content: "";
+    display: block;
+    margin-bottom: 0.75rem;
+
+}
+
+#content .commentlist .text .righttext {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+}
+
+#content .commentlist li p {
+    margin-bottom: var(--line-height);
+    width: auto;
+    word-break: break-word;
+}
+
+
+#content .commentlist li p:last-of-type {
+    margin-bottom: 0;
+}
+
+/* “查看原图按钮” */
+#content .commentlist li p a:not(.view_img_link),
+#content .commentlist li p a:not(.view_img_link):link,
+#content .commentlist li p a:not(.view_img_link):visited {
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
+#content a.view_img_link {
+    display: block;
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    margin-top: 1.5rem;
+    margin-left: 1.5rem;
+    background-color: var(--bg-second);
+    border-radius: 9999px;
+    color: transparent;
+    z-index: 1;
+}
+
+#content a.view_img_link::before {
+    content: "\e90b";
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    font-family: 'Skware' !important;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    line-height: 1;
+
+    transform: translate(-0.02em, 0em);
+}
+
+
+#content .commentlist .text p a.view_img_link + br {
+    display: none;
+}
+
+#content .commentlist li p .view_img_link {
+    opacity: 0;
+}
+
+#content .commentlist li p:hover .view_img_link {
+    opacity: 1;
+}
+
+
+/* 图片 */
+#content .commentlist li p img {
+    display: block;
+    border: var(--border);
+    border-radius: 1.5rem;
+}
+
+#content .commentlist li p img[hidden] {
+    /* GIF 播放器会使用 [hidden] 隐藏图片 */
+    display: none;
+}
+
+/* 如果没有文字，第一张图片添加上 margin-top */
+/* p > .view_img_link:first-child + br + img {
+    margin-top: 0.75rem;
+}
+
+p > .view_img_link:first-child {
+    margin-top: 3rem;
+} */
+
+
+
+/* 页面底部发帖表单 */
+
+#content #commentform {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#content #commentform > * + * {
+    margin-top: 0.75rem;
+}
+
+
+#content #commentform p {
+    font-size: inherit;
+    line-height: inherit;
+    margin-bottom: 0;
+}
+
+#commentform .hide-input {
+    display: flex;
+}
+
+#commentform .hide-input > * + * {
+    margin-left: 0.75rem;
+}
+
+#commentform p {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    font-size: inherit;
+    line-height: inherit;
+}
+
+#commentform .hide-input label {
+    margin-bottom: 0.75rem;
+}
+
+#content #commentform .hide-input input {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    font-size: inherit;
+    line-height: inherit;
+
+    padding: 0.5rem;
+    border: var(--border-input);
+    border-radius: 0.5rem;
+}
+
+#content #commentform .hide-input input:focus {
+    outline: none;
+    border: var(--border-input-focus);
+    box-shadow: var(--shadow-input-focus);
+}
+
+#content #commentform textarea {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    font-size: inherit;
+    line-height: inherit;
+
+    padding: 0.75rem;
+    border: var(--border-input);
+    border-radius: 0.75rem;
+}
+
+#content #commentform textarea:focus {
+    outline: none;
+    border: var(--border-input-focus);
+    box-shadow: var(--shadow-input-focus);
+}
+
+#content #commentform #submit {
+    margin: 0;
+    padding: 0.75rem;
+    width: auto;
+    color: var(--text-primary);
+    font-weight: 700;
+    border: none;
+    border-radius: 1rem;
+    background-color: var(--bg-primary);
+
+    font-size: inherit;
+    line-height: inherit;
+}
+
+#content #commentform p br:last-child {
+    display: none;
+}
+
+#content #commentform #error {
+    margin-top: 0.75rem;
+}
+
+
+/* 投票区 */
+
+#content .jandan-vote,
+#content .tucao-vote {
+    padding: 1rem 0;
+    align-self: stretch;
+    display: flex;
+    align-items: stretch;
+    text-align: left;
+
+    font-size: inherit;
+    line-height: inherit;
+}
+
+#content .jandan-vote,
+#content .tucao-vote, 
+#content .jandan-vote a,
+#content .tucao-vote a {
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.jandan-vote .tucao-like-container,
+.jandan-vote .tucao-unlike-container,
+.tucao-vote .tucao-like-container,
+.tucao-vote .tucao-unlike-container {
+    margin: 0;
+    width: 25%;
+    display: flex;
+    align-items: center;
+}
+
+
+.jandan-vote .comment-report-c {
+    order: 10;
+    margin: 0;
+    width: 25%;
+    flex-shrink: 1;
+    text-align: right;
+}
+
+.jandan-vote .tucao-unlike-container {
+    width: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.jandan-vote a.tucao-btn {
+    width: 50%;
+    margin: -0.75rem -0.75rem -0.75rem auto;
+}
+
+
+/* 替换 OOXX 图标 */
+
+#content .jandan-vote a.like,
+#content .tucao-vote a.like,
+#content .jandan-vote a.like:hover, 
+#content .tucao-vote a.like:hover, 
+#content .jandan-vote a.like:visited, 
+#content .tucao-vote a.like:visited,
+#content .jandan-vote a.unlike,
+#content .tucao-vote a.unlike,
+#content .jandan-vote a.unlike:hover, 
+#content .tucao-vote a.unlike:hover, 
+#content .jandan-vote a.unlike:visited, 
+#content .tucao-vote a.unlike:visited {
+    color: transparent;
+}
+
+#content .jandan-vote .tucao-like-container a,
+#content .tucao-vote .tucao-like-container a,
+#content .jandan-vote .tucao-unlike-container a:first-of-type,
+#content .tucao-vote .tucao-unlike-container a:first-of-type {
+    padding: 0.75rem;
+    margin: -0.75rem -0.25rem -0.75rem -0.75rem;
+    color: transparent;
+
+    width: calc(2.125 * var(--line-height) * 0.625);
+    height: calc(1 * var(--line-height) * 0.625);
+    background-image: url("data:image/svg+xml,%3Csvg width='17' height='8' viewBox='0 0 17 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Ccircle cx='4' cy='4' r='3.25' stroke='%23FFAAAA' stroke-width='1.5'/%3E %3Ccircle cx='13' cy='4' r='3.25' stroke='%23FFAAAA' stroke-width='1.5'/%3E %3C/svg%3E ");
+    background-size: calc(2.125 * var(--line-height) * 0.625) calc(1 * var(--line-height) * 0.625);
+    background-repeat: no-repeat;
+    background-position: center 55%;
+}
+
+#content .jandan-vote .tucao-unlike-container a:first-of-type,
+#content .tucao-vote .tucao-unlike-container a:first-of-type {
+    background-image: url("data:image/svg+xml,%3Csvg width='17' height='8' viewBox='0 0 17 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath d='M0.98439 6.2981L6.64124 0.641243L7.7019 1.7019L2.04505 7.35876L0.98439 6.2981Z' fill='%23AAAAFF'/%3E %3Cpath d='M6.64124 7.35876L0.984391 1.7019L2.04505 0.641243L7.7019 6.2981L6.64124 7.35876Z' fill='%23AAAAFF'/%3E %3Cpath d='M9.2981 6.2981L14.955 0.641243L16.0156 1.7019L10.3588 7.35876L9.2981 6.2981Z' fill='%23AAAAFF'/%3E %3Cpath d='M14.955 7.35876L9.2981 1.7019L10.3588 0.641243L16.0156 6.2981L14.955 7.35876Z' fill='%23AAAAFF'/%3E %3C/svg%3E ");
+    background-size: calc(2.125 * var(--line-height) * 0.68) calc(1 * var(--line-height) * 0.68);
+
+}
+
+#content .jandan-vote .tucao-like-container a:hover,
+#content .tucao-vote .tucao-like-container a:hover,
+#content .jandan-vote .tucao-unlike-container a:first-of-type:hover,
+#content .tucao-vote .tucao-unlike-container a:first-of-type:hover {
+    filter: saturate(8);
+}
+
+
+/* 评论区（吐槽） */
+
+#content .jandan-tucao {
+    border-bottom: var(--border);
+    background-color: unset;
+
+    /* “加载中”的字样需要边距 */
+    padding: 1.5rem;
+}
+
+#content .jandan-tucao > div {
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+}
+
+#content .jandan-tucao > div:first-of-type {
+    margin-top: -1.5rem;
+}
+
+#content .jandan-tucao > div:last-of-type {
+    margin-bottom: -1.5rem;
+}
+
+
+#content .tucao-hot {
+    margin: 0;
+    border: none;
+    background-color: unset;
+}
+
+#content .tucao-hot-title {
+    display: none;
+}
+
+#content .tucao-hot .tucao-row .tucao-floor::before {
+    content: "热评";
+    display: inline;
+    font-weight: 700;
+}
+
+#content .jandan-tucao {
+    position: relative;
+}
+
+#content .jandan-tucao::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0.25rem;
+    background-color: var(--bg-primary);
+}
+
+#content .tucao-author .tucao-location {
+    margin-left: 0.25rem;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-secondary);
+}
+
+#content .tucao-author .tucao-floor {
+    order: 10;
+    margin-left: auto;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-secondary);
+}
+
+#content .tucao-content {
+    padding-right: 4rem;
+}
+
+/* 评论另一条评论 */
+#content .tucao-content .tucao-link,
+#content .tucao-content .tucao-link:link {
+    color: var(--text-primary);
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+#content .tucao-vote .tucao-id {
+    position: absolute;
+    margin: 0;
+    top: 5.25rem;
+    right: 1.5rem;
+    text-align: right;}
+
+
+#content .tucao-vote .tucao-at {
+    display: none;
+}
+
+#content .tucao-vote .tucao-at + span {
+    position: absolute;
+    margin: 0;
+    top: 3.75rem;
+    right: 1.5rem;
+    text-align: right;
+}
+
+#content .tucao-vote .tucao-report {
+    margin-left: auto;
+    text-align: right;
+}
+
+#content .tucao-list {
+    margin: 0;
+    padding: 0;
+}
+
+
+/* 评论区底部按钮（问题反馈 | 收起吐槽） */
+
+#content .jandan-tucao-close {
+    padding: 0.875rem 1.5rem;
+    color: var(--text-secondary);
+    border-bottom: var(--border);
+}
+
+#content .jandan-tucao-close a {
+    display: inline-block;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-primary);
+
+    padding: 0.625rem 1rem 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+}
+
+#content .jandan-tucao-close a:hover {
+    background-color: var(--bg-second);
+}
+
+
+/* 评论区底部发评论表单 */
+
+#content .tucao-form {
+    margin: 0;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    font-size: inherit;
+    line-height: inherit;
+}
+
+#content .tucao-form > * + * {
+    margin-top: 0.75rem;
+}
+
+
+#content .tucao-form > div {
+    padding: 0;
+    line-height: inherit;
+}
+
+/* 删除发评论表单的“个人中心”链接 */
+#content .tucao-form > div a {
+    display: none !important;
+    /* margin: 0 !important;
+    padding: 0 !important;
+    color: var(--text-primary) !important; */
+}
+
+#content textarea.tucao-content {
+    box-sizing: border-box;
+    width: 100% !important;
+    padding: 0.75rem;
+    border: var(--border-input);
+    border-radius: 0.75rem;
+}
+
+#content textarea.tucao-content:focus {
+    outline: none;
+    border: var(--border-input-focus);
+    box-shadow: var(--shadow-input-focus);
+}
+
+#content .tucao-form > div button {
+    margin: 0;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+}
+
+
+/* 页面指示器 */
+
+#content .cp-pagenavi {
+    margin: 0;
+    padding: 1rem 1.5rem;
+    display: flex;
+    border-bottom: var(--border);
+}
+
+#content .cp-pagenavi a,
+#content .cp-pagenavi .current-comment-page {
+    margin: 0;
+    padding: 0.5rem 1rem;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: .5rem;
+    background-color: unset;
+
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-secondary);
+}
+
+#content .comments .cp-pagenavi > * + * {
+    margin-left: 0.5rem;
+}
+
+
+#content .cp-pagenavi .current-comment-page {
+    color: var(--text-primary);
+}
+
+#content .cp-pagenavi a:hover,
+#content .cp-pagenavi .current-comment-page {
+    background-color: #F9FAFB;
+}
+
+
+/* 删除帖子列表前面的“+1”按钮 */
+#content #comments.title {
+    display: none;
+}
+
+/* 删除发帖表单上面的“发表评论”字样 */
+#content #comments .comments > h3 {
+    display: none;
+}
+
+
+.commentlist > .google-auto-placed {
+    margin: 0 -1.5rem;
+    padding: 1.5rem;
+    border-bottom: var(--border);    
+}
+
+.row > .google-auto-placed {
+    margin: 0 -1.5rem;
+    padding: 1.5rem;
+    border-top: var(--border);
+}
+
+.commentlist > .google-auto-placed > ins,
+.row > .google-auto-placed > ins {
+    margin: 0 !important;
+}

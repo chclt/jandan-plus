@@ -1,0 +1,114 @@
+/**
+ * 热榜页面的帖子投票区不太一样，需要额外处理
+ */
+
+#content .hot-tabs {
+    margin: 0;
+    padding: 0.875rem 0.5rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: var(--border);
+}
+
+#content .hot-tabs .hot-tab {
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-primary);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+#content .hot-tabs .hot-tab a {
+    display: block;
+    padding: 0.625rem 1rem;
+}
+
+#content .hot-tabs .hot-tab:hover,
+#content .hot-tabs .hot-tab.current-tab {
+    background-color: var(--bg-second);
+}
+
+#content .hot-tabs .hot-tab.current-tab {
+    font-weight: 700;
+}
+
+#content .hot-tabs a,
+#content .hot-tabs a:link, 
+#content .hot-tabs a:visited{
+    color: inherit;
+}
+
+
+.righttext + small {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: 700;
+}
+
+.righttext + small + br {
+    display: none;
+}
+
+#content .jandan-vote {
+    display: flex;
+    align-items: center;
+}
+
+
+#content .jandan-vote a.like,
+#content .jandan-vote a.unlike {
+    padding: 0.75rem;
+    margin: -0.75rem -0.25rem -0.75rem -0.75rem;
+    color: transparent;
+
+    width: calc(2.125 * var(--line-height) * 0.625);
+    height: calc(1 * var(--line-height) * 0.625);
+    background-image: url("data:image/svg+xml,%3Csvg width='17' height='8' viewBox='0 0 17 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Ccircle cx='4' cy='4' r='3.25' stroke='%23FFAAAA' stroke-width='1.5'/%3E %3Ccircle cx='13' cy='4' r='3.25' stroke='%23FFAAAA' stroke-width='1.5'/%3E %3C/svg%3E ");
+    background-size: calc(2.125 * var(--line-height) * 0.625) calc(1 * var(--line-height) * 0.625);
+    background-repeat: no-repeat;
+    background-position: center 55%;
+}
+
+#content .jandan-vote a.unlike {
+    margin-left: calc(25% - 5rem);
+    background-image: url("data:image/svg+xml,%3Csvg width='17' height='8' viewBox='0 0 17 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E %3Cpath d='M0.98439 6.2981L6.64124 0.641243L7.7019 1.7019L2.04505 7.35876L0.98439 6.2981Z' fill='%23AAAAFF'/%3E %3Cpath d='M6.64124 7.35876L0.984391 1.7019L2.04505 0.641243L7.7019 6.2981L6.64124 7.35876Z' fill='%23AAAAFF'/%3E %3Cpath d='M9.2981 6.2981L14.955 0.641243L16.0156 1.7019L10.3588 7.35876L9.2981 6.2981Z' fill='%23AAAAFF'/%3E %3Cpath d='M14.955 7.35876L9.2981 1.7019L10.3588 0.641243L16.0156 6.2981L14.955 7.35876Z' fill='%23AAAAFF'/%3E %3C/svg%3E ");
+    background-size: calc(2.125 * var(--line-height) * 0.68) calc(1 * var(--line-height) * 0.68);
+}
+
+#content .jandan-vote a.tucao-btn {
+    margin: -0.75rem -0.25rem -0.75rem calc(25% - 5rem);
+    padding: 0.75rem;
+    width: auto;
+}
+
+#content .jandan-vote a.like:hover,
+#content .jandan-vote a.unlike:hover {
+    filter: saturate(8);
+}
+
+#content .jandan-tucao-more {
+    margin: 0 0 -0.875rem;
+    padding: 0.875rem 1.5rem 0;
+    display: flex;
+    justify-content: flex-end;
+    background-color: unset;
+    cursor: auto;
+}
+
+#content .jandan-tucao-more a {
+    margin: 0;
+    padding: 0.625rem 1rem 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: inherit;
+    line-height: inherit;
+    color: var(--text-primary);
+}
+
+#content .jandan-tucao-more a:hover {
+    background-color: var(--bg-second);
+}
