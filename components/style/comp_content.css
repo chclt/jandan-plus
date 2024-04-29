@@ -333,6 +333,13 @@ p > .view_img_link:first-child {
     align-items: center;
 }
 
+.jandan-vote .tucao-like-container {
+    order: 1;
+}
+
+.jandan-vote .tucao-unlike-container {
+    order: 2;
+}
 
 .jandan-vote .comment-report-c {
     order: 10;
@@ -488,13 +495,17 @@ p > .view_img_link:first-child {
     margin: 0;
     top: 5.25rem;
     right: 1.5rem;
-    text-align: right;}
-
-
-#content .tucao-vote .tucao-at {
-    display: none;
+    text-align: right;
 }
 
+#content .tucao-vote .tucao-at {
+    order: 3;
+    margin: 0;
+    width: 25%;
+}
+
+
+/* 时间 */
 #content .tucao-vote .tucao-at + span {
     position: absolute;
     margin: 0;
@@ -504,6 +515,7 @@ p > .view_img_link:first-child {
 }
 
 #content .tucao-vote .tucao-report {
+    order: 4;
     margin-left: auto;
     text-align: right;
 }
