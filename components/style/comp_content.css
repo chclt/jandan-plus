@@ -436,7 +436,7 @@ p > .view_img_link:first-child {
 #content .tucao-hot {
     margin: 0;
     border: none;
-    background-color: unset;
+    background-color: var(--bg-primary-\[opacity-12\]);
 }
 
 #content .tucao-hot-title {

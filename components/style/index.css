@@ -6,6 +6,9 @@
     
     --bg-primary: #FFF200;
     --bg-second: #F9FAFB;
+
+    --bg-primary-\[opacity-12\]: rgba(255, 242, 0, 0.12);
+
     
     --text-primary: rgb(25, 20, 15);
     --text-secondary: rgb(100, 100, 100);
