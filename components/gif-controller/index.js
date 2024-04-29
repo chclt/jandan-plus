@@ -348,8 +348,13 @@ canvas {
                     break;
                 case 'download':
                     if (!this._imageSrc) this._parseSrc();
+                    if (!this._fetched) await this.fetch(true);
+
+                    const image = await fetch(this._imageSrc);
+                    const imageObjectURI = URL.createObjectURL(await image.blob());
+
                     let a = document.createElement('a');
-                    a.href = this._imageSrc;
+                    a.href = imageObjectURI;
                     a.download = this._imageSrc.split('/').pop();
                     a.click();
                     break;
