@@ -356,6 +356,9 @@ canvas {
             }
         });
 
+        this._canvas.addEventListener('click', (event) => {
+            this.shadowRoot.querySelector('[data-action="play"]').click();
+        });
 
         this.shadowRoot.querySelector('.media-controls-progress-panel').addEventListener('pointerdown', (event) => {
             if (!this._fetched) return;
