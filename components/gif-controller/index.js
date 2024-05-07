@@ -542,12 +542,6 @@ canvas {
         this._loadedFrames = decompressFrames(this._gifBuffer, true);
         this.shadowRoot.querySelector('.media-controls-current-frame-display').innerText = `0 / ${this._loadedFrames.length - 1}`;
         this._loaded = true;
-
-        this.dispatchEvent(new Event('load', {
-            bubbles: true,
-            cancelable: true
-        }));
-
     }
 
     renderGIF() {
@@ -709,7 +703,6 @@ imgElList.forEach((img) => {
     src = src.replace('moyu.im', 'sinaimg.cn');
 
     let player = document.createElement('cherry-gif');
-    player.style.maxWidth = '100%';
     config.autoplay ? player.setAttribute('autoplay') : player.setAttribute('preload', 'none');
     player.setAttribute('poster', poster);
     player.setAttribute('crossorigin', '');
@@ -720,10 +713,4 @@ imgElList.forEach((img) => {
     img.insertAdjacentElement('beforebegin', player);
     img.hidden = true;
     img.style.display = 'none !important';
-});
-
-document.addEventListener('load', (event) => {
-    if (event.target.tagName === 'CHERRY-GIF') {
-        event.target.style.width = '100%';
-    }
 });
