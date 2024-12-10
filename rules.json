@@ -39,7 +39,8 @@
     "condition": {
       "requestDomains": [
         "sinaimg.cn",
-        "moyu.im"
+        "moyu.im",
+        "toto.im"
       ],
       "resourceTypes": [
         "main_frame",

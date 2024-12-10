@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "煎煎煎蛋",
     "description": "煎蛋网体验优化",
-    "version": "2.1",
+    "version": "2.2",
     "icons": {
         "16": "assets/icon-16.png",
         "32": "assets/icon-32.png",
@@ -81,6 +81,7 @@
         "*://jandan.net/*",
         "*://i.jandan.net/*",
         "*://*.sinaimg.cn/*",
-        "*://*.moyu.im/*"
+        "*://*.moyu.im/*",
+        "*://*.toto.im/*"
     ]
 }

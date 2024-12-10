@@ -4,6 +4,7 @@ const path = require('path');
 
 
 const ignore = [
+    '.DS_Store', '.idea',
     '.git', '.gitignore',
     'node_modules',
     'package.json', 'package-lock.json',
@@ -45,6 +46,8 @@ function copyFolder(src, dest) {
     const files = fs.readdirSync(src);
 
     for (let i = 0; i < files.length; i++) {
+        if (files[i] === '.DS_Store') continue;
+
         const currPath = path.join(src, files[i]);
         const destPath = path.join(dest, files[i]);
 
