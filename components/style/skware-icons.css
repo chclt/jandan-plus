@@ -77,3 +77,7 @@
 .i-Pointer_Arrow:before {
     content: "\e90d";
 }
+
+.i-Fishpond:before {
+    content: "\e90e";
+}
