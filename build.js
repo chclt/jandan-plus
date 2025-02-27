@@ -34,7 +34,7 @@ fs.readdirSync(__dirname).forEach(file => {
     
 });
 
-execSync('rollup -c --bundleConfigAsCjs');
+execSync('npx rollup -c --bundleConfigAsCjs');
 
 console.log('Done.');
 

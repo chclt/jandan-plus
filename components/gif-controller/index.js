@@ -699,8 +699,8 @@ imgElList.forEach((img) => {
     let poster = img.getAttribute('src');
     let src    = img.getAttribute('org_src') || img.getAttribute('src');
 
-    poster = poster.replace('moyu.im', 'sinaimg.cn');
-    src = src.replace('moyu.im', 'sinaimg.cn');
+    poster = poster.replace('img.toto.im', 'gzw.sinaimg.cn');
+    src = src.replace('img.toto.im', 'gzw.sinaimg.cn');
 
     let player = document.createElement('cherry-gif');
     config.autoplay ? player.setAttribute('autoplay') : player.setAttribute('preload', 'none');

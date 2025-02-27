@@ -5,11 +5,11 @@
     "action": {
       "type": "redirect",
       "redirect": {
-        "regexSubstitution": "https://\\1.sinaimg.cn/\\2"
+        "regexSubstitution": "https://gzw.sinaimg.cn/\\1"
       }
     },
     "condition": {
-      "regexFilter": "^https:\/\/(.*)\\.moyu\\.im\/(.*)",
+      "regexFilter": "^https:\/\/img\\.toto\\.im\/(.*)",
       "resourceTypes": [
         "main_frame",
         "image"
