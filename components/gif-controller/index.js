@@ -807,23 +807,22 @@ if (config.autoplay) {
 // console.log(`为 ${imgElList.length} 个 GIF 图片添加了播放器`);
 
 imgElList.forEach((img) => {
-  let poster = img.getAttribute("src");
-  let src = img.getAttribute("org_src") || img.getAttribute("src");
 
-  poster = poster.replace("moyu.im", "sinaimg.cn");
-  src = src.replace("moyu.im", "sinaimg.cn");
+    let poster = img.getAttribute('src');
+    let src    = img.getAttribute('org_src') || img.getAttribute('src');
 
-  let player = document.createElement("cherry-gif");
-  config.autoplay
-    ? player.setAttribute("autoplay")
-    : player.setAttribute("preload", "none");
-  player.setAttribute("poster", poster);
-  player.setAttribute("crossorigin", "");
-  let source = document.createElement("source");
-  source.setAttribute("src", src);
-  player.appendChild(source);
+    poster = poster.replace('img.toto.im', 'gzw.sinaimg.cn');
+    src = src.replace('img.toto.im', 'gzw.sinaimg.cn');
 
-  img.insertAdjacentElement("beforebegin", player);
-  img.hidden = true;
-  img.style.display = "none !important";
+    let player = document.createElement('cherry-gif');
+    config.autoplay ? player.setAttribute('autoplay') : player.setAttribute('preload', 'none');
+    player.setAttribute('poster', poster);
+    player.setAttribute('crossorigin', '');
+    let source = document.createElement('source');
+    source.setAttribute('src', src);
+    player.appendChild(source);
+
+    img.insertAdjacentElement('beforebegin', player);
+    img.hidden = true;
+    img.style.display = 'none !important';
 });
