@@ -1,12 +1,16 @@
-import '@webcomponents/custom-elements';
-import { parseGIF, decompressFrames } from '@flyskywhy/gifuct-js'
+import { parseGIF, decompressFrames } from "@flyskywhy/gifuct-js";
+// import '@webcomponents/custom-elements';
 
-customElements.define('cherry-gif', class extends HTMLElement {
-    static get observedAttributes() { return [ 'preload', 'autoplay', 'poster', 'src' ]; }
+customElements.define(
+  "cherry-gif",
+  class extends HTMLElement {
+    static get observedAttributes() {
+      return ["preload", "autoplay", "poster", "src"];
+    }
     constructor() {
-        super();
-        let shadowRoot = this.attachShadow({ mode: 'open' });
-        shadowRoot.innerHTML = `
+      super();
+      let shadowRoot = this.attachShadow({ mode: "open" });
+      shadowRoot.innerHTML = `
 <style>
 :host {
     position: relative;
@@ -260,442 +264,550 @@ canvas {
     </div>
 `;
 
-        this.paused = false;
-        this.playbackRate = 1;
-        this.playbackMode = 'forward';
-        this._bounceCount = 0;
+      this.paused = false;
+      this.playbackRate = 1;
+      this.playbackMode = "forward";
+      this._bounceCount = 0;
 
-        this._pointerEvent = {};
+      this._pointerEvent = {};
     }
 
     connectedCallback() {
-        (async () => {
-            this.crossorigin = this.hasAttribute('crossorigin') ? true : false;
+      (async () => {
+        this.crossorigin = this.hasAttribute("crossorigin") ? true : false;
 
-            this.poster = this.getAttribute('poster');
-            this._canvas = this.shadowRoot.querySelector('canvas');
-            this._ctx = this._canvas.getContext('2d', { willReadFrequently: true });
-            this.poster && this._drawPoster();
+        this.poster = this.getAttribute("poster");
+        this._canvas = this.shadowRoot.querySelector("canvas");
+        this._ctx = this._canvas.getContext("2d", { willReadFrequently: true });
+        this.poster && this._drawPoster();
 
-            this._parseAttribute('preload') ? await this.fetch(false) : this.pause();
-            this._parseAttribute('autoplay') && (await this.fetch(false), await this.load(), this.play());
-        })();
+        this._parseAttribute("preload")
+          ? await this.fetch(false)
+          : this.pause();
+        this._parseAttribute("autoplay") &&
+          (await this.fetch(false), await this.load(), this.play());
+      })();
 
-        this.shadowRoot.querySelector('.media-controls-button-group').addEventListener('click', async (event) => {
-            let action = event.target.getAttribute('data-action');
+      this.shadowRoot
+        .querySelector(".media-controls-button-group")
+        .addEventListener("click", async (event) => {
+          let action = event.target.getAttribute("data-action");
 
-            switch (action) {
-                case 'play':
-                case 'prev-frame':
-                case 'next-frame':
-                    if (this._fetching) return;
-                    try {
-                        if (!this._fetched) await this.fetch(true);
-                        else if (!this._loaded) await this.load();
-                    } catch (error) {
-                        return;
-                    }
+          switch (action) {
+            case "play":
+            case "prev-frame":
+            case "next-frame":
+              if (this._fetching) return;
+              try {
+                if (!this._fetched) await this.fetch(true);
+                else if (!this._loaded) await this.load();
+              } catch (error) {
+                return;
+              }
 
-                    break;
+              break;
+          }
 
-            }
+          switch (action) {
+            case "play":
+              if (this.paused) {
+                this.play();
+              } else {
+                this.pause();
+              }
+              break;
+            case "prev-frame":
+              if (this._canvasSize != "gif") {
+                this.renderGIF();
+                this._frameIndex = 1;
+              }
 
-            switch (action) {
-                case 'play':
-                    if (this.paused) {
-                        this.play();
-                    } else {
-                        this.pause();
-                    }
-                    break;
-                case 'prev-frame':
-                    if (this._canvasSize != 'gif') {
-                        this.renderGIF();
-                        this._frameIndex = 1;
-                    }
+              this.pause();
+              this._frameIndex =
+                --this._frameIndex < 0
+                  ? this._loadedFrames.length - 1
+                  : this._frameIndex;
+              this.renderFrame();
+              break;
+            case "next-frame":
+              if (this._canvasSize != "gif") {
+                this.renderGIF();
+                this._frameIndex = -1;
+              }
 
-                    this.pause()
-                    this._frameIndex = --this._frameIndex < 0 ? this._loadedFrames.length - 1 : this._frameIndex;
-                    this.renderFrame();
-                    break;
-                case 'next-frame':
-                    if (this._canvasSize != 'gif') {
-                        this.renderGIF();
-                        this._frameIndex = -1;
-                    }
+              this.pause();
+              this._frameIndex =
+                ++this._frameIndex >= this._loadedFrames.length
+                  ? 0
+                  : this._frameIndex;
+              this.renderFrame();
+              break;
+            case "playback-speed":
+              this.shadowRoot
+                .querySelector(".playback-speed")
+                .classList.remove(`playback-speed-${this.playbackRate / 0.25}`);
+              this.playbackRate =
+                this.playbackRate + 0.25 > 2 ? 0.25 : this.playbackRate + 0.25;
+              this.shadowRoot
+                .querySelector(".playback-speed")
+                .classList.add(`playback-speed-${this.playbackRate / 0.25}`);
+              break;
+            case "playback-mode":
+              if (this.playbackMode === "forward") {
+                this.playbackMode = "bounce";
+                this.shadowRoot
+                  .querySelector(".playback-mode")
+                  .classList.add("playback-mode-bounce");
+              } else if (this.playbackMode === "bounce") {
+                this.playbackMode = "reverse";
+                this.shadowRoot
+                  .querySelector(".playback-mode")
+                  .classList.remove("playback-mode-bounce");
+                this.shadowRoot
+                  .querySelector(".playback-mode")
+                  .classList.add("playback-mode-reverse");
+              } else {
+                this.playbackMode = "forward";
+                this.shadowRoot
+                  .querySelector(".playback-mode")
+                  .classList.remove("playback-mode-reverse");
+              }
+              break;
+            case "download":
+              if (!this._imageSrc) this._parseSrc();
+              if (!this._fetched) await this.fetch(true);
 
-                    this.pause()
-                    this._frameIndex = ++this._frameIndex >= this._loadedFrames.length ? 0 : this._frameIndex;
-                    this.renderFrame();
-                    break;
-                case 'playback-speed':
-                    this.shadowRoot.querySelector('.playback-speed').classList.remove(`playback-speed-${this.playbackRate / 0.25}`);
-                    this.playbackRate = this.playbackRate + 0.25 > 2 ? 0.25 : this.playbackRate + 0.25;
-                    this.shadowRoot.querySelector('.playback-speed').classList.add(`playback-speed-${this.playbackRate / 0.25}`);
-                    break;
-                case 'playback-mode':
-                    if (this.playbackMode === 'forward') {
-                        this.playbackMode = 'bounce'
-                        this.shadowRoot.querySelector('.playback-mode').classList.add('playback-mode-bounce');
-                    } else if (this.playbackMode === 'bounce') {
-                        this.playbackMode = 'reverse'
-                        this.shadowRoot.querySelector('.playback-mode').classList.remove('playback-mode-bounce');
-                        this.shadowRoot.querySelector('.playback-mode').classList.add('playback-mode-reverse');
-                    } else {
-                        this.playbackMode = 'forward'
-                        this.shadowRoot.querySelector('.playback-mode').classList.remove('playback-mode-reverse');
-                    }
-                    break;
-                case 'download':
-                    if (!this._imageSrc) this._parseSrc();
-                    if (!this._fetched) await this.fetch(true);
+              const image = await fetch(this._imageSrc);
+              const imageObjectURI = URL.createObjectURL(await image.blob());
 
-                    const image = await fetch(this._imageSrc);
-                    const imageObjectURI = URL.createObjectURL(await image.blob());
-
-                    let a = document.createElement('a');
-                    a.href = imageObjectURI;
-                    a.download = this._imageSrc.split('/').pop();
-                    a.click();
-                    break;
-            }
+              let a = document.createElement("a");
+              a.href = imageObjectURI;
+              a.download = this._imageSrc.split("/").pop();
+              a.click();
+              break;
+          }
         });
 
-        this._canvas.addEventListener('click', (event) => {
-            this.shadowRoot.querySelector('[data-action="play"]').click();
+      this._canvas.addEventListener("click", (event) => {
+        this.shadowRoot.querySelector('[data-action="play"]').click();
+      });
+
+      this.shadowRoot
+        .querySelector(".media-controls-progress-panel")
+        .addEventListener("pointerdown", (event) => {
+          if (!this._fetched) return;
+
+          event.preventDefault();
+
+          let temp = event.currentTarget.querySelector(
+            ".media-controls-progress"
+          );
+
+          this._pointerEvent.start = {
+            fullWidth: temp.clientWidth,
+            p:
+              event.currentTarget.style
+                .getPropertyValue("--p-play")
+                .replace("%", "") / 100,
+            positionX: event.pageX,
+            paused: this.paused,
+          };
+          this.pause();
+
+          event.stopPropagation();
         });
 
-        this.shadowRoot.querySelector('.media-controls-progress-panel').addEventListener('pointerdown', (event) => {
-            if (!this._fetched) return;
+      document.addEventListener("pointermove", (event) => {
+        if (!this._pointerEvent.start) return;
 
-            event.preventDefault();
+        event.preventDefault();
 
-            let temp = event.currentTarget.querySelector('.media-controls-progress');
+        this._pointerEvent.move = {
+          positionX: event.pageX,
+        };
 
-            this._pointerEvent.start = {
-                fullWidth: temp.clientWidth,
-                p: event.currentTarget.style.getPropertyValue('--p-play').replace('%', '') / 100,
-                positionX: event.pageX,
-                paused: this.paused,
+        let p =
+          this._pointerEvent.start.p +
+          (this._pointerEvent.move.positionX -
+            this._pointerEvent.start.positionX) /
+            this._pointerEvent.start.fullWidth;
+        p = p < 0 ? 0 : p > 1 ? 1 : p;
+        this._frameIndex = Math.floor(p * (this._loadedFrames.length - 1));
+        this.renderFrame();
 
-            };
-            this.pause();
+        event.stopPropagation();
+      });
 
-            event.stopPropagation();
-        });
+      document.addEventListener("pointerup", (event) => {
+        if (!this._pointerEvent.start) return;
 
-        document.addEventListener('pointermove', (event) => {
-            if (!this._pointerEvent.start) return;
+        event.preventDefault();
 
-            event.preventDefault();
+        if (!this._pointerEvent.start.paused) this.play();
+        this._pointerEvent = {};
 
-            this._pointerEvent.move = {
-                positionX: event.pageX
-            };
-
-            let p = this._pointerEvent.start.p + (this._pointerEvent.move.positionX - this._pointerEvent.start.positionX) / this._pointerEvent.start.fullWidth;
-            p = p < 0 ? 0 : p > 1 ? 1 : p;
-            this._frameIndex = Math.floor(p * (this._loadedFrames.length - 1));
-            this.renderFrame();
-
-            event.stopPropagation();
-        });
-
-        document.addEventListener('pointerup', (event) => {
-            if (!this._pointerEvent.start) return;
-
-            event.preventDefault();
-
-            if (!this._pointerEvent.start.paused) this.play();
-            this._pointerEvent = {};
-
-            event.stopPropagation();
-        });
+        event.stopPropagation();
+      });
     }
 
     _parseAttribute(name) {
-        let value;
-        switch (name) {
-            case 'preload':
-                return this.preload = this.getAttribute('preload') === 'none' ? false : true;
-                break;
-            case 'autoplay':
-                value = this.getAttribute('autoplay');
-                if (value === '') return this.autoplay = true;
-                else return this.autoplay = value === 'false' ? false : (this._parseAttribute('preload') ? true : false);
-                break;
-        }
+      let value;
+      switch (name) {
+        case "preload":
+          return (this.preload =
+            this.getAttribute("preload") === "none" ? false : true);
+          break;
+        case "autoplay":
+          value = this.getAttribute("autoplay");
+          if (value === "") return (this.autoplay = true);
+          else
+            return (this.autoplay =
+              value === "false"
+                ? false
+                : this._parseAttribute("preload")
+                ? true
+                : false);
+          break;
+      }
     }
 
     disconnectedCallback() {
-        this.pause();
+      this.pause();
     }
 
     _drawPoster() {
-        if (this.poster) {
-            let poster = new Image();
-            poster.onload = (event) => {
-                if (this._timeoutID) return; // play started
-                this.shadowRoot.querySelector('canvas').width = poster.width;
-                this.shadowRoot.querySelector('canvas').height = poster.height;
-                this.shadowRoot.querySelector('canvas').getContext('2d').drawImage(poster, 0, 0);
-                this._canvasSize = 'poster';
-            }
-            poster.src = this.poster;
-        }
+      if (this.poster) {
+        let poster = new Image();
+        poster.onload = (event) => {
+          if (this._timeoutID) return; // play started
+          this.shadowRoot.querySelector("canvas").width = poster.width;
+          this.shadowRoot.querySelector("canvas").height = poster.height;
+          this.shadowRoot
+            .querySelector("canvas")
+            .getContext("2d")
+            .drawImage(poster, 0, 0);
+          this._canvasSize = "poster";
+        };
+        poster.src = this.poster;
+      }
     }
 
     _parseSrc() {
-        let imageSrc;
-        let source = this.querySelector('source');
-        if (source) {
-            imageSrc = source.getAttribute('src');
-        } else {
-            imageSrc = this.getAttribute('src');
-        }
-        return this._imageSrc = imageSrc;
+      let imageSrc;
+      let source = this.querySelector("source");
+      if (source) {
+        imageSrc = source.getAttribute("src");
+      } else {
+        imageSrc = this.getAttribute("src");
+      }
+      return (this._imageSrc = imageSrc);
     }
 
     async fetch(autoload = true) {
-        if (this._fetching) return;
+      if (this._fetching) return;
 
-        this._parseSrc();
+      this._parseSrc();
 
-        if (!this._imageSrc) return;
-        if (this._fetched == this._imageSrc) return;
+      if (!this._imageSrc) return;
+      if (this._fetched == this._imageSrc) return;
 
-        this._fetching = true;
-        // this.shadowRoot.querySelector('.play-pause').classList.add('loading');
-        this._fetched = this._imageSrc;
-        this.shadowRoot.querySelector('.media-controls-current-frame-display').innerText = `加载中`;
+      this._fetching = true;
+      // this.shadowRoot.querySelector('.play-pause').classList.add('loading');
+      this._fetched = this._imageSrc;
+      this.shadowRoot.querySelector(
+        ".media-controls-current-frame-display"
+      ).innerText = `加载中`;
 
+      try {
+        let response = await fetch(this._imageSrc, {
+          mode: this.crossorigin ? "cors" : "no-cors",
+        });
 
-        try {
-            let response = await fetch(this._imageSrc, { mode: this.crossorigin ? 'cors' : 'no-cors' });
-
-            if (!response.ok) {
-                this._fetched = false;
-                throw new Error(response);
-            }
-
-            let contentLength = response.headers.get('content-length');
-            let reader = response.body.getReader();
-            let receivedLength = 0;
-            let chunks = [];
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) {
-                    break;
-                }
-                chunks.push(value);
-                receivedLength += value.length;
-
-                this.shadowRoot.querySelector('.media-controls-current-frame-display').innerText = `加载中 ${Math.floor((receivedLength / contentLength) * 100)}%`;
-                this.shadowRoot.querySelector('.media-controls-progress-panel').style.setProperty('--p-decode', `${receivedLength / contentLength * 100}%`);
-            }
-
-            let chunksAll = new Uint8Array(receivedLength);
-            let position = 0;
-            for (let chunk of chunks) {
-                chunksAll.set(chunk, position);
-                position += chunk.length;
-            }
-
-            this._fetching = false;
-            // this.shadowRoot.querySelector('.play-pause').classList.remove('loading');
-
-            this._gifBuffer = parseGIF(chunksAll);
-
-            if (autoload) this.load();
-
-        } catch (error) {
-            this._fetched = false;
-            this._fetching = false;
-            // this.shadowRoot.querySelector('.play-pause').classList.remove('loading');
-            this.shadowRoot.querySelector('.media-controls-current-frame-display').innerText = `加载失败`;
-            throw error;
+        if (!response.ok) {
+          this._fetched = false;
+          throw new Error(response);
         }
+
+        let contentLength = response.headers.get("content-length");
+        let reader = response.body.getReader();
+        let receivedLength = 0;
+        let chunks = [];
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+          chunks.push(value);
+          receivedLength += value.length;
+
+          this.shadowRoot.querySelector(
+            ".media-controls-current-frame-display"
+          ).innerText = `加载中 ${Math.floor(
+            (receivedLength / contentLength) * 100
+          )}%`;
+          this.shadowRoot
+            .querySelector(".media-controls-progress-panel")
+            .style.setProperty(
+              "--p-decode",
+              `${(receivedLength / contentLength) * 100}%`
+            );
+        }
+
+        let chunksAll = new Uint8Array(receivedLength);
+        let position = 0;
+        for (let chunk of chunks) {
+          chunksAll.set(chunk, position);
+          position += chunk.length;
+        }
+
+        this._fetching = false;
+        // this.shadowRoot.querySelector('.play-pause').classList.remove('loading');
+
+        this._gifBuffer = parseGIF(chunksAll);
+
+        if (autoload) this.load();
+      } catch (error) {
+        this._fetched = false;
+        this._fetching = false;
+        // this.shadowRoot.querySelector('.play-pause').classList.remove('loading');
+        this.shadowRoot.querySelector(
+          ".media-controls-current-frame-display"
+        ).innerText = `加载失败`;
+        throw error;
+      }
     }
 
     async load() {
-        if (this._fetching) return;
+      if (this._fetching) return;
 
-        if (!this._fetched) await this.fetch(false);
+      if (!this._fetched) await this.fetch(false);
 
-        this.pause();
-        if (this._timeoutID) {
-            clearTimeout(this._timeoutID);
-        }
+      this.pause();
+      if (this._timeoutID) {
+        clearTimeout(this._timeoutID);
+      }
 
-        // gif patch canvas
-        this._tempCanvas = document.createElement('canvas');
-        this._tempCtx = this._tempCanvas.getContext('2d', { willReadFrequently: true });
-        // full gif canvas
-        this._gifCanvas = document.createElement('canvas');
-        this._gifCtx = this._gifCanvas.getContext('2d', { willReadFrequently: true });
+      // gif patch canvas
+      this._tempCanvas = document.createElement("canvas");
+      this._tempCtx = this._tempCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
+      // full gif canvas
+      this._gifCanvas = document.createElement("canvas");
+      this._gifCtx = this._gifCanvas.getContext("2d", {
+        willReadFrequently: true,
+      });
 
-        this._loadedFrames = [];
-        this._frameIndex = 0;
-        this._frameImageData = null;
-        this._needsDisposal = false;
+      this._loadedFrames = [];
+      this._frameIndex = 0;
+      this._frameImageData = null;
+      this._needsDisposal = false;
 
-        this._loadedFrames = decompressFrames(this._gifBuffer, true);
-        this.shadowRoot.querySelector('.media-controls-current-frame-display').innerText = `0 / ${this._loadedFrames.length - 1}`;
-        this._loaded = true;
+      this._loadedFrames = decompressFrames(this._gifBuffer, true);
+      this.shadowRoot.querySelector(
+        ".media-controls-current-frame-display"
+      ).innerText = `0 / ${this._loadedFrames.length - 1}`;
+      this._loaded = true;
     }
 
     renderGIF() {
-        switch (this.playbackMode) {
-          case 'reverse':
-            this._frameIndex = this._loadedFrames.length - 1
-            break
-          default:
-            this._frameIndex = 0
-            break
-        }
+      switch (this.playbackMode) {
+        case "reverse":
+          this._frameIndex = this._loadedFrames.length - 1;
+          break;
+        default:
+          this._frameIndex = 0;
+          break;
+      }
 
-        this._canvas.width = this._loadedFrames[0].dims.width
-        this._canvas.height = this._loadedFrames[0].dims.height
+      this._canvas.width = this._loadedFrames[0].dims.width;
+      this._canvas.height = this._loadedFrames[0].dims.height;
 
-        this._gifCanvas.width = this._canvas.width
-        this._gifCanvas.height = this._canvas.height
+      this._gifCanvas.width = this._canvas.width;
+      this._gifCanvas.height = this._canvas.height;
 
-        this._canvasSize = 'gif';
+      this._canvasSize = "gif";
     }
 
     _drawPatch(frame) {
-        let dims = frame.dims;
+      let dims = frame.dims;
 
-        if (
-            !this._frameImageData ||
-            dims.width != this._frameImageData.width ||
-            dims.height != this._frameImageData.height
-        ) {
-            this._tempCanvas.width = dims.width;
-            this._tempCanvas.height = dims.height;
-            this._frameImageData = this._tempCtx.createImageData(dims.width, dims.height);
-        }
+      if (
+        !this._frameImageData ||
+        dims.width != this._frameImageData.width ||
+        dims.height != this._frameImageData.height
+      ) {
+        this._tempCanvas.width = dims.width;
+        this._tempCanvas.height = dims.height;
+        this._frameImageData = this._tempCtx.createImageData(
+          dims.width,
+          dims.height
+        );
+      }
 
-        // set the patch data as an override
-        this._frameImageData.data.set(frame.patch);
+      // set the patch data as an override
+      this._frameImageData.data.set(frame.patch);
 
-        // draw the patch back over the canvas
-        this._tempCtx.putImageData(this._frameImageData, 0, 0);
+      // draw the patch back over the canvas
+      this._tempCtx.putImageData(this._frameImageData, 0, 0);
 
-        this._gifCtx.drawImage(this._tempCanvas, dims.left, dims.top);
+      this._gifCtx.drawImage(this._tempCanvas, dims.left, dims.top);
     }
 
     _manipulate() {
-        let imageData = this._gifCtx.getImageData(0, 0, this._gifCanvas.width, this._gifCanvas.height);
-        let other = this._gifCtx.createImageData(this._gifCanvas.width, this._gifCanvas.height);
+      let imageData = this._gifCtx.getImageData(
+        0,
+        0,
+        this._gifCanvas.width,
+        this._gifCanvas.height
+      );
+      let other = this._gifCtx.createImageData(
+        this._gifCanvas.width,
+        this._gifCanvas.height
+      );
 
-        let pixelPercent = 100;;
-        let pixelsX = 5 + Math.floor((pixelPercent / 100) * (this._canvas.width - 5));
-        let pixelsY = (pixelsX * this._canvas.height) / this._canvas.width;
+      let pixelPercent = 100;
+      let pixelsX =
+        5 + Math.floor((pixelPercent / 100) * (this._canvas.width - 5));
+      let pixelsY = (pixelsX * this._canvas.height) / this._canvas.width;
 
-        this._ctx.putImageData(imageData, 0, 0);
-        this._ctx.drawImage(this._canvas, 0, 0, this._canvas.width, this._canvas.height, 0, 0, pixelsX, pixelsY);
-        this._ctx.drawImage(this._canvas, 0, 0, pixelsX, pixelsY, 0, 0, this._canvas.width, this._canvas.height);
-
+      this._ctx.putImageData(imageData, 0, 0);
+      this._ctx.drawImage(
+        this._canvas,
+        0,
+        0,
+        this._canvas.width,
+        this._canvas.height,
+        0,
+        0,
+        pixelsX,
+        pixelsY
+      );
+      this._ctx.drawImage(
+        this._canvas,
+        0,
+        0,
+        pixelsX,
+        pixelsY,
+        0,
+        0,
+        this._canvas.width,
+        this._canvas.height
+      );
     }
 
     renderFrame(frameIndex = undefined) {
-        if (frameIndex !== undefined) this._frameIndex = frameIndex;
-        let frame = this._loadedFrames[this._frameIndex];
-        let start = new Date().getTime();
+      if (frameIndex !== undefined) this._frameIndex = frameIndex;
+      let frame = this._loadedFrames[this._frameIndex];
+      let start = new Date().getTime();
 
-        if (this._needsDisposal) {
-            this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-            this._needsDisposal = false;
-        }
+      if (this._needsDisposal) {
+        this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        this._needsDisposal = false;
+      }
 
-        this._drawPatch(frame);
+      this._drawPatch(frame);
 
-        this._manipulate();
+      this._manipulate();
 
-        this.shadowRoot.querySelector('.media-controls-current-frame-display').innerText = `${this._frameIndex} / ${this._loadedFrames.length - 1}`;
-        this.shadowRoot.querySelector('.media-controls-progress-panel').style.setProperty('--p-play', `${(this._frameIndex + 1) / this._loadedFrames.length * 100}%`);
+      this.shadowRoot.querySelector(
+        ".media-controls-current-frame-display"
+      ).innerText = `${this._frameIndex} / ${this._loadedFrames.length - 1}`;
+      this.shadowRoot
+        .querySelector(".media-controls-progress-panel")
+        .style.setProperty(
+          "--p-play",
+          `${((this._frameIndex + 1) / this._loadedFrames.length) * 100}%`
+        );
 
-        if (frame.disposalType === 2) {
-            this._needsDisposal = true;
-        }
+      if (frame.disposalType === 2) {
+        this._needsDisposal = true;
+      }
 
-        if (!this.paused) {
+      if (!this.paused) {
         switch (this.playbackMode) {
-            case 'reverse':
-                this._frameIndex--;
-                if (this._frameIndex < 0)
-                    this._frameIndex = this._loadedFrames.length - 1;
-                break;
-            case 'bounce':
-                if (this._bounceCount) {
-                    this._frameIndex--;
-                    if (this._frameIndex < 0) {
-                        this._frameIndex = 1;
-                        this._bounceCount = 0;
-                    }
-                  } else {
-                    this._frameIndex++;
-                    if (this._frameIndex >= this._loadedFrames.length) {
-                        this._frameIndex = this._loadedFrames.length - 2;
-                        this._bounceCount = 1;
-                    }
-                  }
-                  break;
-            default:
-                this._frameIndex++;
-                if (this._frameIndex >= this._loadedFrames.length) {
-                    this._frameIndex = 0;
-                }
-                break;
+          case "reverse":
+            this._frameIndex--;
+            if (this._frameIndex < 0)
+              this._frameIndex = this._loadedFrames.length - 1;
+            break;
+          case "bounce":
+            if (this._bounceCount) {
+              this._frameIndex--;
+              if (this._frameIndex < 0) {
+                this._frameIndex = 1;
+                this._bounceCount = 0;
+              }
+            } else {
+              this._frameIndex++;
+              if (this._frameIndex >= this._loadedFrames.length) {
+                this._frameIndex = this._loadedFrames.length - 2;
+                this._bounceCount = 1;
+              }
+            }
+            break;
+          default:
+            this._frameIndex++;
+            if (this._frameIndex >= this._loadedFrames.length) {
+              this._frameIndex = 0;
+            }
+            break;
         }
 
         let end = new Date().getTime();
         let diff = end - start;
 
-            let that = this;
-            this._timeoutID = setTimeout(() => {
-                requestAnimationFrame(() => {
-                    that.renderFrame();
-                });
-            }, Math.max(0, Math.floor((frame.delay - diff) / this.playbackRate)));
-        }
+        let that = this;
+        this._timeoutID = setTimeout(() => {
+          requestAnimationFrame(() => {
+            that.renderFrame();
+          });
+        }, Math.max(0, Math.floor((frame.delay - diff) / this.playbackRate)));
+      }
     }
 
     play() {
-        this.paused = false;
+      this.paused = false;
 
-        if (this._canvasSize !== 'gif') this.renderGIF();
-        this.renderFrame();
+      if (this._canvasSize !== "gif") this.renderGIF();
+      this.renderFrame();
 
-        this.shadowRoot.querySelector('.play-pause').classList.add('pause');
-        this.shadowRoot.querySelector('.play-pause').classList.remove('play');
-        this.shadowRoot.querySelector('.media-controls-enclosure').classList.remove('show');
+      this.shadowRoot.querySelector(".play-pause").classList.add("pause");
+      this.shadowRoot.querySelector(".play-pause").classList.remove("play");
+      this.shadowRoot
+        .querySelector(".media-controls-enclosure")
+        .classList.remove("show");
     }
 
     pause() {
-        this.paused = true;
-        this.shadowRoot.querySelector('.play-pause').classList.add('play');
-        this.shadowRoot.querySelector('.play-pause').classList.remove('pause');
-        this.shadowRoot.querySelector('.media-controls-enclosure').classList.add('show');
+      this.paused = true;
+      this.shadowRoot.querySelector(".play-pause").classList.add("play");
+      this.shadowRoot.querySelector(".play-pause").classList.remove("pause");
+      this.shadowRoot
+        .querySelector(".media-controls-enclosure")
+        .classList.add("show");
     }
-});
+  }
+);
 
 let config = {
-    autoplay: document.querySelector('#gif-click-load-off')?.classList.contains('switch-current')
+  autoplay: document
+    .querySelector("#gif-click-load-off")
+    ?.classList.contains("switch-current"),
 };
 
 let imgElList;
 
 if (config.autoplay) {
-    imgElList = document.querySelectorAll('img[src$=".gif"]');
+  imgElList = document.querySelectorAll('img[src$=".gif"]');
 } else {
-    imgElList = document.querySelectorAll('img[org_src]');
+  imgElList = document.querySelectorAll("img[org_src]");
 }
 
 // console.log(`为 ${imgElList.length} 个 GIF 图片添加了播放器`);
 
 imgElList.forEach((img) => {
+
     let poster = img.getAttribute('src');
     let src    = img.getAttribute('org_src') || img.getAttribute('src');
 
