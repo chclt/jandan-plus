@@ -6,7 +6,7 @@ const navItemIcons = [
     { name: '无聊图', icon: 'Favorites' },
     { name: '妹子图', icon: 'Favorites' },
     { name: '女装', icon: 'Favorites' },
-    { name: 'BBS', icon: 'Hash' },
+    { name: '鱼塘', icon: 'Hash' },
     { name: '热榜', icon: 'Diary' },
     { name: '大杂烩', icon: 'Hash' },
     { name: '个人中心', icon: 'Person' },

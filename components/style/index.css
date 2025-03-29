@@ -284,6 +284,7 @@ body #wrapper {
 #body #sidebar {
     grid-column: span 1;
     width: 100%;
+    overflow: hidden;
 }
 
 /* Search Box */
